@@ -22,6 +22,7 @@ const env = {
   // Vapi agent for AI Speech
   vapi: {
     apiToken: String(process.env.NEXT_PUBLIC_VAPI_WEB_TOKEN),
+    workflowId: String(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID),
   },
 
 
