@@ -18,6 +18,13 @@ const env = {
       measurementId: String(process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID),
     }
   },
+
+  // Vapi agent for AI Speech
+  vapi: {
+    apiToken: String(process.env.NEXT_PUBLIC_VAPI_WEB_TOKEN),
+  },
+
+
   nodeEnv: String(process.env.NODE_ENV),
 }
 
