@@ -8,6 +8,7 @@ import { vapi } from '@/lib/vapi.sdk';
 import Image from 'next/image'
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
+import { UserRound } from "lucide-react"
 
 enum CallStatus {
   INACTIVE = "INACTIVE",
@@ -149,13 +150,12 @@ function Agent({ userName, type, userId, interviewId, questions }: AgentProps) {
 
         <div className='card-border'>
           <div className='card-content'>
-            <Image
-              alt='User avatar'
-              src='/user-avatar.png'
-              width={540}
-              height={540}
-              className='object-cover rounded-full size-[120px]'
-            />
+            <div
+              className='object-cover grid place-content-center bg-gray-300 rounded-full size-[120px]'
+            >
+              {/* TODO:add user avatar */}
+              <UserRound size={60} className='text-slate-800'/>
+            </div>
             <h3>{userName}</h3>
           </div>
         </div>
