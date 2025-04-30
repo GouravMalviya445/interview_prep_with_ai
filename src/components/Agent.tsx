@@ -1,5 +1,6 @@
 "use client";
 
+import { interviewer } from '@/constants';
 import env from '@/env';
 import { cn } from '@/lib/utils';
 import { vapi } from '@/lib/vapi.sdk';
@@ -19,7 +20,7 @@ interface SavedMessage{
   content: string;
 }
 
-function Agent({ userName, type, userId }: AgentProps) {
+function Agent({ userName, type, userId, interviewId, questions }: AgentProps) {
   const router = useRouter();
   
   const [callStatus, setCallStatus] = useState<CallStatus>(CallStatus.INACTIVE);
@@ -62,8 +63,31 @@ function Agent({ userName, type, userId }: AgentProps) {
     }
   }, [])
 
+  const handleGenerateFeedback = async (messages: SavedMessage[]) => {
+    console.log("Generating feedback...");
+
+    // TODO: create a server action that generates feedback
+    const { success, id } = {
+      success: true, id: "feedbackId"
+    }
+
+    if (success && id) {
+      router.push(`/interview/${interviewId}/feedback`)
+    } else {
+      console.log("Error saving feedback");
+      router.push("/");
+    }
+  }
+
   useEffect(() => {
-    if (callStatus === CallStatus.FINISHED) router.push("/");
+    if (callStatus === CallStatus.FINISHED) {
+      if (type === "generate") {
+        router.push("/");
+      } else {
+        handleGenerateFeedback(messages);
+      }
+    }
+    
   }, [messages, callStatus, type, userId]);
 
 
@@ -71,12 +95,27 @@ function Agent({ userName, type, userId }: AgentProps) {
   const handleCall = async () => { 
     setCallStatus(CallStatus.CONNECTING);
 
-    await vapi.start(env.vapi.workflowId, {
-      variableValues: {
-        username: userName,
-        userId
+    if (type === "generate") {
+      await vapi.start(env.vapi.workflowId, {
+        variableValues: {
+          username: userName,
+          userId
+        }
+      })
+    } else {
+      let formattedQuestions = "";
+      if (questions) {
+        formattedQuestions = questions.
+          map((question) => `- ${question}`)
+          .join("\n");
       }
-    })
+      await vapi.start(interviewer, {
+        variableValues: {
+          questions: formattedQuestions,
+        }
+      })
+    }
+
   }
 
   const handleDisconnect = () => {
