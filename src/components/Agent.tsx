@@ -74,7 +74,7 @@ function Agent({ userName, type, userId }: AgentProps) {
     await vapi.start(env.vapi.workflowId, {
       variableValues: {
         username: userName,
-        userId: userId
+        userId
       }
     })
   }

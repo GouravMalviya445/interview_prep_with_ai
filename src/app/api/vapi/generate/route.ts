@@ -5,8 +5,8 @@ import { getRandomInterviewCover } from "@/lib/utils";
 import { db } from "@/firebase/admin";
 
 export async function POST(request: NextRequest, response: NextResponse) {
-  const { type, role, level, techStack, amount, userId } = await request?.json();
-  if (!type || !role || !level || !techStack || !amount || !userId) {
+  const { type, role, level, techstack, amount, userId } = await request?.json();
+  if (!type || !role || !level || !techstack || !amount || !userId) {
     return NextResponse.json({
       success: false,
       error: "Missing required parameters"
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest, response: NextResponse) {
       prompt: `Prepare questions for a job interview.
         The job role is ${role}.
         The job experience level is ${level}.
-        The tech stack used in the job is: ${techStack}.
+        The tech stack used in the job is: ${techstack}.
         The focus between behavioral and technical questions should lean towards: ${type}.
         The amount of questions required is: ${amount}.
         Please return only the questions, without any additional text.
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest, response: NextResponse) {
 
     const interview = {
       role, type, level,
-      techStack: techStack.split(","),
+      techstack: techstack.split(","),
       questions: JSON.parse(questions),
       userId,
       finalized: true,

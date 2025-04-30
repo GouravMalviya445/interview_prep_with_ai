@@ -2,8 +2,8 @@ import { cn, getTechLogos } from '@/lib/utils'
 import Image from 'next/image';
 import React from 'react'
 
-async function DisplayTechIcons({ techStack }: TechIconProps) {
-  const techIcons = await getTechLogos(techStack);
+async function DisplayTechIcons({ techstack }: TechIconProps) {
+  const techIcons = await getTechLogos(techstack);
   return (
     <div className='flex flex-row gap-2'>
       {techIcons.slice(0, 3).map(({tech, url}, index) => (
