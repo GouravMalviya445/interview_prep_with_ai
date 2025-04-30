@@ -14,6 +14,8 @@ import { useRouter } from "next/navigation";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/firebase/client";
 import { signIn, signUp } from "@/lib/action/auth.action";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 
 // zod schema for form validation
@@ -21,7 +23,7 @@ const authFormSchema = (isTypeLogin: boolean) => {
   return z.object({
     email: z.string().email("Invalid email address"),
     password: z.string().min(8, "Password must be at least 8 characters long"),
-    name:  !isTypeLogin ? z.string().min(1, "Name is required").max(50, "Name must be less than 50 characters") : z.string().optional(),
+    name:  !isTypeLogin ? z.string().min(3, "Name is required").max(50, "Name must be less than 50 characters") : z.string().optional(),
   })
 }
 
@@ -29,6 +31,7 @@ const authFormSchema = (isTypeLogin: boolean) => {
 function AuthForm({ type }: { type: FormType }) {
   const isTypeLogin = type === "login";
   const formSchema = authFormSchema(isTypeLogin);
+  const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
   
@@ -41,9 +44,12 @@ function AuthForm({ type }: { type: FormType }) {
       password: "",
     },
   })
- 
+
+  const { errors } = form.formState;
+  
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
     try {
       if (!isTypeLogin) {
         // user registration part
@@ -63,6 +69,8 @@ function AuthForm({ type }: { type: FormType }) {
           return;
         }
         
+        form.reset();
+        setIsLoading(false);
         toast.success("Account created successfully. Please log in");
         router.push("/login");
       } else {
@@ -83,12 +91,17 @@ function AuthForm({ type }: { type: FormType }) {
           idToken
         })
         
+        form.reset();
+        setIsLoading(false);
         toast.success("Account log in successfully");
         router.push("/");
       }
     } catch (err: any) {
+      setIsLoading(false);
       console.log(`Error in ${type} form submission: `, err);      
       toast.error(`There was an error ${isTypeLogin ? "logging in" : "registering"} the user: ${err.message}`);
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -117,12 +130,16 @@ function AuthForm({ type }: { type: FormType }) {
             className="w-full space-y-6 mt-4 form"
           >
             {!isTypeLogin && (
-              <FormField
-                control={form.control}
-                name="name"
-                label="Name"
-                placeholder="Your Name"
-              />
+              <>
+                <FormField
+                  control={form.control}
+                  name="name"
+                  label="Name"
+                  placeholder="Your Name"
+                />
+                {/* Display error message for name field */}
+                {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
+              </>
             )}
 
             {/* Email Field */}
@@ -133,6 +150,8 @@ function AuthForm({ type }: { type: FormType }) {
               type="email"
               placeholder="your@example.com"
             />
+            {/* Display error message for email field */}
+            {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
             
             {/* Password Field */}
             <FormField
@@ -142,8 +161,25 @@ function AuthForm({ type }: { type: FormType }) {
               type="password"
               placeholder="Enter your password"
             />
+            {/* Display error message for password field */}
+            {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
 
-            <Button className="btn" type="submit">{isTypeLogin ? "Log In" : "Register"}</Button>
+            <Button
+              className={
+                cn(
+                  "btn",
+                  isLoading && "cursor-not-allowed"
+                )
+              }
+              type="submit"
+              disabled={isLoading}
+            >
+              {
+                isLoading ?
+                  "loading..." :
+                  (isTypeLogin ? "Log In" : "Register")
+              }
+            </Button>
           </form>
         </Form>
         

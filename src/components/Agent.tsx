@@ -2,6 +2,7 @@
 
 import { interviewer } from '@/constants';
 import env from '@/env';
+import { createFeedback } from '@/lib/action/general.action';
 import { cn } from '@/lib/utils';
 import { vapi } from '@/lib/vapi.sdk';
 import Image from 'next/image'
@@ -67,9 +68,11 @@ function Agent({ userName, type, userId, interviewId, questions }: AgentProps) {
     console.log("Generating feedback...");
 
     // TODO: create a server action that generates feedback
-    const { success, id } = {
-      success: true, id: "feedbackId"
-    }
+    const { success, feedbackId: id } = await createFeedback({
+      interviewId: interviewId!,
+      userId: userId!,
+      transcript: messages
+    })
 
     if (success && id) {
       router.push(`/interview/${interviewId}/feedback`)
