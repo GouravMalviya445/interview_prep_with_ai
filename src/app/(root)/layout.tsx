@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const isUserAuthenticated = await isAuthenticated();
 
-  if (!isUserAuthenticated) redirect("/login");
+  if (!isUserAuthenticated) redirect("/home");
   
   return (
     <div className="root-layout">
